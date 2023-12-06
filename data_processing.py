@@ -25,7 +25,7 @@ f = open(file,'r')
 lines = f.read()
 lines = lines.split()
 
-list_of_words = lines[:]
+
 list_of_occurr = list()
 
  # Work in progress
@@ -40,13 +40,14 @@ list_of_occurr = list()
 #                 new_word = new_word + j
 #         list_of_words = remove_word(i,list_of_words)
 #         list_of_occurr.append(occurances(i,lines))
-for i in lines:
-    word = ''
-    for j in i:
-        if j.isalpha():
-            word = word + j
-    list_of_words = remove_word(i,list_of_words)
-    list_of_occurr.append(occurances(i,lines))
+# list_of_words = lines[:]
+# for i in lines:
+#     word = ''
+#     for j in i:
+#         if j.isalpha():
+#             word = word + j
+#     list_of_words = remove_word(word,list_of_words)
+#     list_of_occurr.append(occurances(i,lines))
 
 
 print(lines)
