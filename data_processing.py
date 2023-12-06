@@ -1,5 +1,9 @@
 import os
+from dotenv import load_dotenv
 
-file = open('/Users/enzom/code/cst 1101/final/CST1101_Final_Project/words.txt','r')
+load_dotenv() 
 
+file = os.getenv("file")
+file = open(file,'r')
+    
 file.close()
