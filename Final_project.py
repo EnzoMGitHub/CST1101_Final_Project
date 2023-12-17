@@ -66,13 +66,10 @@ class Word_frequency_analyzer:
         plt.ylabel("Frequency")
         plt.xticks(rotation=45, ha="right")
         plt.tight_layout()
-        file_path = self.file_path.get()
-        save_path = file_path.rsplit('.', 1)[0] + "_" + title.lower().replace(" ", "_") + ".png"
-        plt.savefig(save_path)
         plt.show()
 
     def show_error(self, message):
-        tk.messagebox.showerror("Error", message)
+        tk.messagebox.showerror("Error")
     def run(self):
         self.root.mainloop()
 
