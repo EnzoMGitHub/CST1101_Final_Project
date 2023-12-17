@@ -49,7 +49,7 @@ class Word_frequency_analyzer:
                 return
             self.plot_bar_chart(frequencies, title)
         except Exception as e:
-            self.show_error(f"An error occurred: {str(e)}")
+            self.show_error("An error occurred")
     def get_word_frequencies(self, content, filter_stopwords):
         words = content.lower().split()
         if filter_stopwords:
