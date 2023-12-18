@@ -29,10 +29,10 @@ def remove_duplicates(lis):
 def merge(lis1,lis2):
     return {lis1[n]:lis2[n] for n in range(len(lis1))}
 def word_frequencies(initial_words):
-    
+    init_change = initial_words.split()
     words = list()
     no_dupe = list()
-    for i in initial_words:
+    for i in init_change:
         words.append(remove_punctuation(i))
 
     no_dupe = remove_duplicates(words)
@@ -55,7 +55,6 @@ def char_frequencies(lis):
     
 def plot_words():
     plot.bar(dictionary.keys(),dictionary.values())
-    
     # plot.xticks(rotation=70)
     plot.show()
 def convertdirectory(dir):
