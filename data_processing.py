@@ -4,6 +4,7 @@ import tkinter
 from tkinter import ttk, filedialog
 import matplotlib.pyplot as plot
 
+msg_count = 0
 
 def remove_punctuation(string):
     ret = ''
@@ -70,7 +71,7 @@ def plot_chars():
     plot.show()
 
 def create_var():
-    global initial_words,dictionary,char_dict
+    global initial_words,dictionary,char_dict,msg_count
     try:
         file_path = filedialog.askopenfilename(filetypes=[('Text Files', '*.txt')])
         with open(file_path, 'r') as file:
@@ -78,49 +79,42 @@ def create_var():
         dictionary = word_frequencies(initial_words)
         char_dict = char_frequencies(initial_words)
     except FileNotFoundError:
-        for i in root.grid_slaves(column=0,row=5):
-            i.destroy()
-        messageErr = ttk.Label(frm,text='Please select a text file after clicking the open file button')
-        messageErr.grid(column=0,row=5)
+        ttk.Label(frm,text=str(msg_count + 1) + '. Please select a text file after clicking the open file button').grid(column=0,row=msg_count+6)
+        msg_count = msg_count + 1
     except UnicodeDecodeError: # Error gets raised if you try to convert a given file type and open it in the program, which raises the UnicodeDecodeError
-        for i in root.grid_slaves(column=0,row=5):
-            i.destroy()
-        messageErr1 = ttk.Label(frm,text='Please select a text file')
-        messageErr1.grid(column=0,row=5)
+        ttk.Label(frm,text=str(msg_count + 1) + '. Please select a text file').grid(column=0,row=msg_count+6)
+        msg_count = msg_count + 1
     
-    
+def gen():
+    global msg_count
+    try:
+        if value.get() == 0:
+            ttk.Label(frm,text=str(msg_count + 1) + '. Please Select Either Word Mode Or Character Mode').grid(column=0,row=msg_count+6)
+            msg_count = msg_count + 1
+        elif value.get() == 1:
+            plot_words()
+        elif value.get() == 2:
+            plot_chars()
+    except NameError:
+        ttk.Label(frm,text=str(msg_count + 1) + '. Please Select A Text File Before Generating').grid(column=0,row=msg_count+6)
+        msg_count = msg_count + 1
 
 def down():
+    global msg_count
     if value.get() == 0:
-        for i in root.grid_slaves(column=0,row=5):
-            i.destroy()
-        messageDown = ttk.Label(frm,text='Please Select Either Word Mode Or Character Mode')
-        messageDown.grid(column=0,row=5)
+        ttk.Label(frm,text=str(msg_count + 1) + '. Please Select Either Word Mode Or Character Mode').grid(column=0,row=msg_count+6)
+        msg_count = msg_count + 1
     elif value.get() == 1:
         plot.bar(dictionary.keys(),dictionary.values())
         plot.savefig('graph.png')
-        for i in root.grid_slaves(column=0,row=5):
-            i.destroy()
-        messageDown = ttk.Label(frm,text='Successfuly saved as \'graph.png\'!')
-        messageDown.grid(column=0,row=5)
+        ttk.Label(frm,text=str(msg_count + 1) + '. Successfuly saved as \'graph.png\'!').grid(column=0,row=msg_count+6)
+        msg_count = msg_count + 1
     elif value.get() == 2:
         plot.bar(char_dict.keys(),char_dict.values())
         plot.savefig('graph.png')
-        for i in root.grid_slaves(column=0,row=5):
-            print(i)
-            i.destroy()
-        messageDown = ttk.Label(frm,text='Successfuly saved as \'graph.png\'!')
-        messageDown.grid(column=0,row=5)
+        ttk.Label(frm,text=str(msg_count + 1) + '. Successfuly saved as \'graph.png\'!').grid(column=0,row=msg_count+6)
+        msg_count = msg_count + 1
 
-# file = 0 # Creating a file variable that will allow the while loop to work
-# while file == 0: # If the file variable doesnt get updated continue the loop, this allows the user to get unlimited attempts 
-#     try:
-#         global directory
-#         directory = input('What is the file path of the text file?')
-#         file = open(directory,'r')
-#         initial_words = file.read().split()
-#     except:
-#         print('This file does not exist')
 
 
 
@@ -128,8 +122,10 @@ root = tkinter.Tk()
 frm = ttk.Frame(root, padding=10)
 frm.grid()
 value = tkinter.IntVar()
-ttk.Radiobutton(frm,text='Word Mode',command=plot_words,value=1,variable=value).grid(column=0,row=1)
-ttk.Radiobutton(frm,text='Character Mode',command=plot_chars,value=2,variable=value).grid(column=0,row=2)
+ttk.Radiobutton(frm,text='Word Mode',value=1,variable=value).grid(column=0,row=1)
+ttk.Radiobutton(frm,text='Character Mode',value=2,variable=value).grid(column=0,row=2)
 ttk.Button(frm, text='Open File', command=create_var).grid(column=0,row=3)
-ttk.Button(frm,text='Download', command=down).grid(column=0,row=4)
+ttk.Button(frm,text='Generate', command=gen).grid(column=0,row=4)
+ttk.Button(frm,text='Download', command=down).grid(column=0,row=5)
+
 root.mainloop()
