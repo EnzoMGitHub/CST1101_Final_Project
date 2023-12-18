@@ -1,8 +1,9 @@
 
 # Word Frequency Calculator 
-from tkinter import *
-from tkinter import ttk
+import tkinter
+from tkinter import ttk, filedialog
 import matplotlib.pyplot as plot
+
 
 def remove_punctuation(string):
     ret = ''
@@ -56,26 +57,79 @@ def plot_words():
     
     # plot.xticks(rotation=70)
     plot.show()
+def convertdirectory(dir):
+    new_dir = dir.split('/')
+    new_dir.remove(new_dir[-1])
+    new_str = '/'.join(new_dir)
+    return new_str
 
 def plot_chars():
+    global chars
     plot.bar(char_dict.keys(),char_dict.values())
+    plot.savefig('graph.png')
     plot.show()
 
-file = 0 # Creating a file variable that will allow the while loop to work
-while file == 0: # If the file variable doesnt get updated continue the loop, this allows the user to get unlimited attempts 
+def create_var():
+    global initial_words,dictionary,char_dict
     try:
-        file = open(input('What is the file path of the text file?'),'r')
-        initial_words = file.read().split()
-    except:
-        print('This file does not exist')
-dictionary = word_frequencies(initial_words)
-char_dict = char_frequencies(initial_words)
+        file_path = filedialog.askopenfilename(filetypes=[('Text Files', '*.txt')])
+        with open(file_path, 'r') as file:
+            initial_words = file.read()
+        dictionary = word_frequencies(initial_words)
+        char_dict = char_frequencies(initial_words)
+    except FileNotFoundError:
+        for i in root.grid_slaves(column=0,row=5):
+            i.destroy()
+        messageErr = ttk.Label(frm,text='Please select a text file after clicking the open file button')
+        messageErr.grid(column=0,row=5)
+    except UnicodeDecodeError: # Error gets raised if you try to convert a given file type and open it in the program, which raises the UnicodeDecodeError
+        for i in root.grid_slaves(column=0,row=5):
+            i.destroy()
+        messageErr1 = ttk.Label(frm,text='Please select a text file')
+        messageErr1.grid(column=0,row=5)
+    
+    
+
+def down():
+    if value.get() == 0:
+        for i in root.grid_slaves(column=0,row=5):
+            i.destroy()
+        messageDown = ttk.Label(frm,text='Please Select Either Word Mode Or Character Mode')
+        messageDown.grid(column=0,row=5)
+    elif value.get() == 1:
+        plot.bar(dictionary.keys(),dictionary.values())
+        plot.savefig('graph.png')
+        for i in root.grid_slaves(column=0,row=5):
+            i.destroy()
+        messageDown = ttk.Label(frm,text='Successfuly saved as \'graph.png\'!')
+        messageDown.grid(column=0,row=5)
+    elif value.get() == 2:
+        plot.bar(char_dict.keys(),char_dict.values())
+        plot.savefig('graph.png')
+        for i in root.grid_slaves(column=0,row=5):
+            print(i)
+            i.destroy()
+        messageDown = ttk.Label(frm,text='Successfuly saved as \'graph.png\'!')
+        messageDown.grid(column=0,row=5)
+
+# file = 0 # Creating a file variable that will allow the while loop to work
+# while file == 0: # If the file variable doesnt get updated continue the loop, this allows the user to get unlimited attempts 
+#     try:
+#         global directory
+#         directory = input('What is the file path of the text file?')
+#         file = open(directory,'r')
+#         initial_words = file.read().split()
+#     except:
+#         print('This file does not exist')
 
 
-root = Tk()
+
+root = tkinter.Tk()
 frm = ttk.Frame(root, padding=10)
 frm.grid()
-ttk.Radiobutton(frm,text='Word Mode',command=plot_words,value=1).grid(column=0,row=1)
-ttk.Radiobutton(frm,text='Character Mode',command=plot_chars,value=2).grid(column=0,row=2)
+value = tkinter.IntVar()
+ttk.Radiobutton(frm,text='Word Mode',command=plot_words,value=1,variable=value).grid(column=0,row=1)
+ttk.Radiobutton(frm,text='Character Mode',command=plot_chars,value=2,variable=value).grid(column=0,row=2)
+ttk.Button(frm, text='Open File', command=create_var).grid(column=0,row=3)
+ttk.Button(frm,text='Download', command=down).grid(column=0,row=4)
 root.mainloop()
-file.close()
