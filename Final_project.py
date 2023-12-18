@@ -1,78 +1,97 @@
-import tkinter as tk
-from tkinter import filedialog
+from tkinter import ttk, filedialog
+import tkinter as tk  
+import matplotlib.pyplot as plot
 from collections import Counter
-import matplotlib.pyplot as plt
-from wordcloud import STOPWORDS
 
-class Word_frequency_analyzer:
-    def __init__(self):
-        self.root = tk.Tk()
-        self.root.title("Final Project")
-        self.file_path = tk.StringVar()
-        self.analysis_type = tk.StringVar()
-        self.stopwords_var = tk.BooleanVar()
-        self.create_widgets()
+initial_words = ''
+dictionary = {}
+char_dict = {}
+msg_count = 0
 
-    def create_widgets(self):
-        tk.Label(self.root, text="Select a Text File:").pack(pady=10)
-        tk.Button(self.root, text="Browse", command=self.browse_file).pack(pady=5)
-        tk.Label(self.root, text="Select Analysis Type:").pack(pady=10)
-        tk.Radiobutton(self.root, text="Word Frequencies", variable=self.analysis_type, value="word").pack()
-        tk.Radiobutton(self.root, text="Character Frequencies", variable=self.analysis_type, value="char").pack()
-        tk.Checkbutton(self.root, text="Filter Stopwords", variable=self.stopwords_var).pack(pady=10)
-        tk.Button(self.root, text="Analyze", command=self.analyze).pack(pady=10)
+def remove_punctuation(string):
+    return ''.join(char for char in string if char.isalnum() or char.isspace())
 
-    def browse_file(self):
-        file_path = filedialog.askopenfilename(filetypes=[("Text Files", "*.txt")])
-        self.file_path.set(file_path)
+def word_frequencies(text):
+    words = text.split()
+    return Counter(words)
 
-    def analyze(self):
-        file_path = self.file_path.get()
-        analysis_type = self.analysis_type.get()
-        filter_stopwords = self.stopwords_var.get()
+def char_frequencies(text):
+    cleaned_text = remove_punctuation(text)
+    return Counter(cleaned_text)
 
-        if not file_path:
-            self.show_error("Please select a text file.")
-            return
-        try:
-            with open(file_path, 'r', encoding='utf-8') as file:
-                content = file.read()
+def plot_words():
+    plot.bar(dictionary.keys(), dictionary.values())
+    plot.show()
 
-            if analysis_type == "word":
-                frequencies = self.get_word_frequencies(content, filter_stopwords)
-                title = "Word Frequencies"
-            elif analysis_type == "char":
-                frequencies = self.get_char_frequencies(content)
-                title = "Character Frequencies"
-            else:
-                self.show_error("Invalid analysis type.")
-                return
-            self.plot_bar_chart(frequencies, title)
-        except Exception as e:
-            self.show_error("An error occurred")
-    def get_word_frequencies(self, content, filter_stopwords):
-        words = content.lower().split()
-        if filter_stopwords:
-            words = [word for word in words if word not in STOPWORDS]
-        return Counter(words)
-    
-    def get_char_frequencies(self, content):
-        return Counter(content.lower())
-    
-    def plot_bar_chart(self, frequencies, title):
-        plt.bar(frequencies.keys(), frequencies.values())
-        plt.title(title)
-        plt.xlabel("Words" if title == "Word Frequencies" else "Characters")
-        plt.ylabel("Frequency")
-        plt.xticks(rotation=45, ha="right")
-        plt.tight_layout()
-        plt.show()
+def plot_chars():
+    plot.bar(char_dict.keys(), char_dict.values())
+    plot.show()
 
-    def show_error(self, message):
-        tk.messagebox.showerror("Error")
-    def run(self):
-        self.root.mainloop()
+def create_var():
+    global initial_words, dictionary, char_dict, msg_count
+    try:
+        file_path = filedialog.askopenfilename(filetypes=[('Text Files', '*.txt')])
+        with open(file_path, 'r') as file:
+            initial_words = file.read()
+        dictionary = word_frequencies(initial_words)
+        char_dict = char_frequencies(initial_words)
+    except FileNotFoundError:
+        handle_error('Please select a text file after clicking the open file button')
+    except UnicodeDecodeError:
+        handle_error('Please select a valid text file')
 
-if __name__ == "__main__":
-    analyzer = Word_frequency_analyzer()
-    analyzer.run()
+def handle_error(error_message):
+    global msg_count
+    for widget in frm.grid_slaves(column=0, row=5):
+        widget.destroy()
+    message_err = ttk.Label(frm, text=error_message)
+    message_err.grid(column=0, row=5)
+    ttk.Label(frm, text=f'{msg_count + 1}. {error_message}').grid(column=0, row=msg_count + 6)
+    msg_count += 1
+
+def gen():
+    global msg_count
+    try:
+        if value.get() == 0:
+            handle_error('Please Select Either Word Mode Or Character Mode')
+        elif value.get() == 1:
+            plot_words()
+        elif value.get() == 2:
+            plot_chars()
+    except NameError:
+        handle_error('Please Select A Text File Before Generating')
+
+def down():
+    global msg_count
+    try:
+        if value.get() == 0:
+            handle_error('Please Select Either Word Mode Or Character Mode')
+        elif value.get() == 1 or value.get() == 2:
+            plot.bar(dictionary.keys(), dictionary.values())
+            plot.savefig('graph.png')
+            for widget in frm.grid_slaves(column=0, row=5):
+                widget.destroy()
+            message_down = ttk.Label(frm, text='Successfully saved as \'graph.png\'!')
+            message_down.grid(column=0, row=5)
+            ttk.Label(frm, text=f'{msg_count + 1}. Successfully saved as \'graph.png\'!').grid(column=0, row=msg_count + 6)
+            msg_count += 1
+    except NameError:
+        handle_error('Please Select A Text File Before Downloading')
+
+root = tk.Tk()
+frm = ttk.Frame(root, padding=10)
+frm.grid()
+frame_mode = ttk.LabelFrame(frm, text='Select Analysis Mode')
+frame_mode.grid(column=0, row=0, padx=10, pady=10, sticky='W')
+frame_buttons = ttk.Frame(frm)
+frame_buttons.grid(column=0, row=1, pady=10)
+value = tk.IntVar()
+
+ttk.Radiobutton(frame_mode, text='Word Mode', command=plot_words, value=1, variable=value).grid(column=0, row=0, sticky='W')
+ttk.Radiobutton(frame_mode, text='Character Mode', command=plot_chars, value=2, variable=value).grid(column=1, row=0, sticky='W')
+ttk.Button(frame_buttons, text='Open File', command=create_var).grid(column=0, row=0, padx=5)
+ttk.Button(frame_buttons, text='Generate', command=gen).grid(column=1, row=0, padx=5)
+ttk.Button(frame_buttons, text='Download', command=down).grid(column=2, row=0, padx=5)
+
+root.mainloop()
+
