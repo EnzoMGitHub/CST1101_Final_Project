@@ -1,4 +1,3 @@
-
 # Word Frequency Calculator 
 import tkinter
 from tkinter import ttk, filedialog
@@ -79,19 +78,24 @@ def char_frequencies(): # takes in no arguments, the purpose of this function is
     return merge(no_dupe_chars,freqs)
 
     
-def plot_words(): # This function is called when the matplotlib graph needs to generate the chart for word mode
-    global word_dict # grabs the word_dict var for re-assignment purposes
+def plot_words():
+    global word_dict
     
-    if check.get() == 1: # If the word frequency box is checked then it will assign word_dict to a dictionary that excludes stop words
+    if check.get() == 1:
         word_dict = word_frequencies_stop(initial_words)
-    else: # If the word frequency box is not checked then the word_dict is assigned to a dictionary that includes all of the words
+    else:
         word_dict = word_frequencies(initial_words)
-    plot.bar(word_dict.keys(),word_dict.values()) # Creates the bar graph with the words as labels and the frequencies as the height
-    plot.show() # Displays the graph
+    
+    plot.bar(word_dict.keys(), word_dict.values())
+    plot.xlabel('Words')  # Add x-axis label
+    plot.ylabel('Frequency')  # Add y-axis label
+    plot.show()
 
-def plot_chars(): # This function is called when the matplotlib graph needs to generate the chart for character mode
-    plot.bar(char_dict.keys(),char_dict.values())  # Creates the bar graph with the characters as labels and the frequencies as the height
-    plot.show() # Displays the graph
+def plot_chars():
+    plot.bar(char_dict.keys(), char_dict.values())
+    plot.xlabel('Characters')  # Add x-axis label
+    plot.ylabel('Frequency')  # Add y-axis label
+    plot.show()
 
 # Called when the 'Open File' button is clicked
 def create_var(): # This function is mainly used for setup, it creates the global variable which contains the selected file's content
